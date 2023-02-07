@@ -1,2 +1,4 @@
 <launch>
+    <include file="$(find turtlebot3_slam)/launch/turtlebot3_slam.launch"/>
+    <node pkg='hw1' name='avoid_wall_real' type='avoid_wall_real.py'/>
 </launch>

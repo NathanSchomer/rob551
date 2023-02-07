@@ -1,4 +1,4 @@
 <launch>
     <include file="$(find stage_osu)/launch/simple_rooms.launch"/>
-    <node pkg='hw1' name='avoid_wall' type='avoid_wall.py'/>
+    <node pkg='hw1' name='avoid_wall_stage' type='avoid_wall_stage.py'/>
 </launch>
