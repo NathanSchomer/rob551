@@ -21,7 +21,8 @@ from sensor_msgs.msg import LaserScan
 def callback(scan):
 	# Every time we get a laser scan, calculate the shortest scan distance, and set
 	# the speed accordingly.
-	shortest = min(scan.ranges)
+	mid_idx = len(scan.ranges)//2
+	center_dist = scan.ranges[mid_idx]
 
 	# Create a twist and fill in all the fields.  For now, we're going to set a
 	# constant speed.
