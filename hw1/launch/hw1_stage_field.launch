@@ -1,0 +1,4 @@
+<launch>
+    <include file="$(find stage_osu)/launch/simple_rooms.launch"/>
+    <node pkg='hw1' name='field_nav' type='field_nav_stage.py'/>
+</launch>

@@ -7,6 +7,7 @@ from math import tanh
 
 def callback(data):
 
+	dist = data.ranges[0]
 	vel = (tanh(dist-0.3)*0.5)
 	vel -= vel%0.01
 
@@ -32,7 +33,7 @@ if __name__ == '__main__':
 	publisher = rospy.Publisher('cmd_vel', Twist, queue_size=10)
 
 	# subscribe to lidar
-	rospy.Subscriber('base_scan', LaserScan, callback)
+	rospy.Subscriber('scan', LaserScan, callback)
 
 	# spin() simply keeps python from exiting until this node is stopped
 	rospy.spin()
