@@ -67,3 +67,58 @@ if __name__ == '__main__':
 
     cmd_vel = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
     rospy.spin()
+
+# #!/usr/bin/env python3
+# import numpy as np
+# import rospy
+# from sensor_msgs.msg import LaserScan
+# from math import sin, cos, pi, tanh, sqrt, acos, degrees, isinf
+# from geometry_msgs.msg import Twist
+
+# from time import time
+
+# def calc_obs_components(data, max_dist=1):
+#     new_ranges = []
+#     angles = np.linspace(data.angle_min, data.angle_max, len(data.ranges))
+#     for theta, dist in zip(angles, data.ranges):
+#         if isinf(dist) or dist > 0.5:
+#             continue
+#         theta = (theta + pi) % 2*pi # flip the angle to get the opposing vector
+#         new_ranges.append((theta, dist))
+#     return new_ranges
+
+# def calc_obs_vector(data, new_ranges):
+#     xs = []
+#     ys = []
+#     for theta, dist in new_ranges:
+#         xs.append((1-tanh(dist/4)) * cos(theta))
+#         ys.append((1-tanh(dist/4)) * sin(theta))
+#     x, y = np.sum(xs), np.sum(ys)
+#     return x, y
+
+# def listener(data):
+
+#     new_ranges = calc_obs_components(data)
+#     x, y = calc_obs_vector(data, new_ranges)
+
+#     x += 1
+#     mag = sqrt(x**2 + y**2)
+#     theta = acos(x/mag)
+
+#     if y < 0:
+#         theta *= -1
+
+#     t = Twist()
+#     t.linear.x = tanh(mag)*0.4
+#     t.angular.z = tanh(theta)*.8
+#     rospy.loginfo(f'Published theta = {t.angular.z}')
+
+#     cmd_vel.publish(t)
+
+# if __name__ == '__main__':
+
+#     rospy.init_node('field_nav')
+#     rospy.Subscriber('/scan', LaserScan, listener)
+
+#     cmd_vel = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+#     rospy.spin()
