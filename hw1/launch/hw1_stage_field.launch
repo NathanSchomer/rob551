@@ -3,7 +3,7 @@
     <node pkg='hw1' name='field_nav' type='field_nav.py'>
         <param name='ignore_dist' value='1' type='double'/>
         <param name='dist_exp' value='2' type='double'/>
-        <param name='forward_vec' value='0.1' type='double'/>
+        <param name='forward_vec' value='0.5' type='double'/>
         <param name='max_ang_rate' value='2' type='double'/>
         <param name='vel_scale' value='0.5' type='double'/>
         <param name='ang_scale' value='0.5' type='double'/>

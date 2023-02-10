@@ -21,8 +21,10 @@ def callback(data):
 
 if __name__ == '__main__':
 
+	# initialize node
 	rospy.init_node('avoid_wall', anonymous=True)
 
+	# get private parameters set in launch file
 	stop_dist = rospy.get_param('~stop_dist')
 	max_vel = rospy.get_param('~max_vel')
 	ranges_idx = rospy.get_param('~ranges_idx')
