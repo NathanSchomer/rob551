@@ -1,4 +1,14 @@
 <launch>
     <include file="$(find stage_osu)/launch/simple_rooms.launch"/>
-    <node pkg='hw1' name='field_nav' type='field_nav_stage.py'/>
+    <node pkg='hw1' name='field_nav' type='field_nav.py'>
+        <param name='ignore_dist' value='1' type='double'/>
+        <param name='dist_exp' value='2' type='double'/>
+        <param name='forward_vec' value='0.1' type='double'/>
+        <param name='max_ang_rate' value='2' type='double'/>
+        <param name='vel_scale' value='0.5' type='double'/>
+        <param name='ang_scale' value='0.5' type='double'/>
+        <param name='fov' value='1.5707963267948966' type='double'/>
+        <param name='lidar_topic' value='base_scan' type='str'/>
+        <param name='zero_dist' value='0.5' type='double'/>
+    </node>
 </launch>

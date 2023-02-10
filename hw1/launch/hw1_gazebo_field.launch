@@ -1,6 +1,16 @@
 <launch>
-    <include file="$(find turtlebot3_gazebo)/launch/turtlebot3_world.launch">
+    <include file="$(find turtlebot3_gazebo)/launch/turtlebot3_house.launch">
         <arg name="model" value="burger"/>
     </include>
-    <node pkg='hw1' name='field_nav' type='field_nav_gazebo.py'/>
+    <node pkg='hw1' name='field_nav' type='field_nav.py'>
+        <param name='ignore_dist' value='1.1' type='double'/>
+        <param name='dist_exp' value='3' type='double'/>
+        <param name='forward_vec' value='0.3' type='double'/>
+        <param name='max_ang_rate' value='2' type='double'/>
+        <param name='vel_scale' value='0.75' type='double'/>
+        <param name='ang_scale' value='0.75' type='double'/>
+        <param name='fov' value='1.5707963267948966' type='double'/>
+        <param name='lidar_topic' value='scan' type='str'/>
+        <param name='zero_dist' value='0.3' type='double'/>
+    </node>
 </launch>

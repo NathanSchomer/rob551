@@ -1,4 +1,10 @@
 <launch>
     <include file="$(find stage_osu)/launch/simple_rooms.launch"/>
-    <node pkg='hw1' name='avoid_wall_stage' type='avoid_wall_stage.py'/>
+    <node pkg='hw1' name='avoid_wall' type='avoid_wall.py'>
+        <param name='stop_dist' value='0.6' type='double'/>
+        <param name='max_vel' value='1' type='int'/>
+        <param name='ranges_idx' value='89' type='int'/>
+        <param name='lidar_topic' value='base_scan' type='str'/>
+        <param name='vel_topic' value='cmd_vel' type='str'/>
+    </node>
 </launch>
