@@ -1,0 +1,6 @@
+<launch>
+    <include file="$(find stage_osu)/launch/simple_rooms.launch"/>
+    <node pkg='hw2' name='MCL' type='markov_loc.py'>
+        <param name='map' value="$(find stage_osu)/config/simple_rooms.png" type='str'/>
+    </node>
+</launch>
