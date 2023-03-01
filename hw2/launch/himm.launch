@@ -1,0 +1,4 @@
+<launch>
+    <node pkg="rosbag" type="play" name="himm_stage_bag" args="--clock $(find hw2)/bags/himm_stage.bag"/>
+    <node pkg='hw2' name='HIMM' type='himm.py'/>
+</launch>
