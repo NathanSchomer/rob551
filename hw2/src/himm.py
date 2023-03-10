@@ -10,34 +10,30 @@ from pathlib import Path
 from math import radians, degrees
 from cv_bridge import CvBridge, CvBridgeError
 import cv2
-from math import cos, sin
+from math import cos, sin, inf
 from tf.transformations import euler_from_quaternion
 
 
 class HIMM:
-    def __init__(self, map_path):
-
-        rospy.init_node('himm', anonymous=True)
+    def __init__(self, pose_topic, lidar_topic, map_dim, pose_offset, scale_factor, max_range):
 
         # load map
-        assert Path(map_path).is_file()
-        self.map_img = np.asarray(PImage.open(map_path))
-        self.map_dims = (300, 300)
+        self.map_dims = (map_dim, map_dim)
 
         # initialize map to all zeros
         self.map = np.zeros(self.map_dims, dtype=np.uint8)
 
         # subscribe to lidar and pose data
         self.pose = None
-        self.sub_pose = rospy.Subscriber('base_pose_ground_truth', Odometry, self.pose_callback)
-        self.sub_lidar = rospy.Subscriber('base_scan', LaserScan, self.lidar_callback)
+        self.sub_pose = rospy.Subscriber(pose_topic, Odometry, self.pose_callback) # TODO: this type might be wrong
+        self.sub_lidar = rospy.Subscriber(lidar_topic, LaserScan, self.lidar_callback)
         self.pub_map = rospy.Publisher('map', Image, queue_size=10)
 
         self.INC_VAL, self.DEC_VAL = 3, -1
         self.CELL_MIN, self.CELL_MAX = 0, 15
-        self.POSE_OFFSET = 8
-        self.SCALE_FACTOR = 10
-        self.MAX_RANGE = 8
+        self.POSE_OFFSET = pose_offset
+        self.SCALE_FACTOR = scale_factor
+        self.MAX_RANGE = max_range
 
         self.thetas = []
 
@@ -113,7 +109,9 @@ class HIMM:
             img[idx[0], idx[1], 1:2] = 0
             img[idx[0], idx[1], 0] = 255
 
-        cv2.imwrite('/media/psf/Home/Desktop/img.png', img)
+        # TODO: flip map upside down... and maybe sideways?
+
+        # cv2.imwrite('/media/psf/Home/Desktop/img.png', img)
         ros_img = self.bridge.cv2_to_imgmsg(img)
         self.pub_map.publish(ros_img)
 
@@ -122,10 +120,12 @@ class HIMM:
             self.init_thetas(lidar_data)
         pose = self.pose
         inc_idxs, dec_idxs = set(), set()
-        for theta, range in zip(self.thetas, lidar_data.ranges):
-            range *= self.SCALE_FACTOR
-            endpoint = self.calc_endpoint(theta, range, pose)
-            if range < self.MAX_RANGE * self.SCALE_FACTOR:
+        for theta, curr_range in zip(self.thetas, lidar_data.ranges):
+            curr_range *= self.SCALE_FACTOR
+            if curr_range == inf:
+                continue
+            endpoint = self.calc_endpoint(theta, curr_range, pose)
+            if curr_range < self.MAX_RANGE * self.SCALE_FACTOR:
                 inc_idxs.add(endpoint)
             dec_idxs.union(self.calc_empty_cells(pose, endpoint))
         self.inc_map(inc_idxs)
@@ -134,6 +134,15 @@ class HIMM:
 
 
 if __name__ == '__main__':
-    map_path = '/home/nathan/catkin_ws/src/rob551/stage_osu/config/simple_rooms.png'
-    himm = HIMM(map_path)
+
+    rospy.init_node('himm', anonymous=True)
+
+    pose_topic = rospy.get_param('~pose_topic', default='/base_pose_ground_truth')
+    lidar_topic = rospy.get_param('~lidar_topic', default='/base_scan')
+    map_dim = rospy.get_param('~map_dim', default=1000)
+    pose_offset = rospy.get_param('~pose_offset', default=8)
+    scale_factor = rospy.get_param('~scale_factor', default=10)
+    max_range = rospy.get_param('~max_range', default=np.inf)
+
+    himm = HIMM(pose_topic, lidar_topic, map_dim, pose_offset, scale_factor, max_range)
     rospy.spin()
