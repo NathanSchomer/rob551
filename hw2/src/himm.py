@@ -27,7 +27,7 @@ class HIMM:
         self.pose = None
         self.sub_pose = rospy.Subscriber(pose_topic, Odometry, self.pose_callback) # TODO: this type might be wrong
         self.sub_lidar = rospy.Subscriber(lidar_topic, LaserScan, self.lidar_callback)
-        self.pub_map = rospy.Publisher('map', Image, queue_size=10)
+        self.pub_map = rospy.Publisher('himm_map', Image, queue_size=10)
 
         self.INC_VAL, self.DEC_VAL = 3, -1
         self.CELL_MIN, self.CELL_MAX = 0, 15
@@ -50,10 +50,11 @@ class HIMM:
 
     def mod_map(self, idxs: set, val: int):
         for idx in idxs:
+
             new_val = int(self.map[idx]) + val
-            if new_val > self.CELL_MAX:
+            if new_val >= self.CELL_MAX:
                 new_val = self.CELL_MAX
-            if new_val < self.CELL_MIN:
+            if new_val <= self.CELL_MIN:
                 new_val = self.CELL_MIN
             self.map[idx] = new_val
 
@@ -109,8 +110,7 @@ class HIMM:
             img[idx[0], idx[1], 1:2] = 0
             img[idx[0], idx[1], 0] = 255
 
-        # TODO: flip map upside down... and maybe sideways?
-
+        img = np.rot90(img, k=2)
         # cv2.imwrite('/media/psf/Home/Desktop/img.png', img)
         ros_img = self.bridge.cv2_to_imgmsg(img)
         self.pub_map.publish(ros_img)
@@ -122,7 +122,7 @@ class HIMM:
         inc_idxs, dec_idxs = set(), set()
         for theta, curr_range in zip(self.thetas, lidar_data.ranges):
             curr_range *= self.SCALE_FACTOR
-            if curr_range == inf:
+            if curr_range == inf or pose is None:
                 continue
             endpoint = self.calc_endpoint(theta, curr_range, pose)
             if curr_range < self.MAX_RANGE * self.SCALE_FACTOR:
@@ -131,15 +131,16 @@ class HIMM:
         self.inc_map(inc_idxs)
         self.dec_map(dec_idxs)
         self.publish_map()
+        # rospy.signal_shutdown('himm node shutting down')
 
 
 if __name__ == '__main__':
 
     rospy.init_node('himm', anonymous=True)
 
-    pose_topic = rospy.get_param('~pose_topic', default='/base_pose_ground_truth')
-    lidar_topic = rospy.get_param('~lidar_topic', default='/base_scan')
-    map_dim = rospy.get_param('~map_dim', default=1000)
+    pose_topic = rospy.get_param('~pose_topic', default='base_pose_ground_truth')
+    lidar_topic = rospy.get_param('~lidar_topic', default='base_scan')
+    map_dim = rospy.get_param('~map_dim', default=300)
     pose_offset = rospy.get_param('~pose_offset', default=8)
     scale_factor = rospy.get_param('~scale_factor', default=10)
     max_range = rospy.get_param('~max_range', default=np.inf)

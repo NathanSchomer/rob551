@@ -43,14 +43,13 @@ class MarkovLoc:
 		self.pub_loc = rospy.Publisher('loc', PoseWithCovariance, queue_size=10)
 
 		self.lidar_angles = []
-		self.lidar_ranges = []
 
 		self.bridge = CvBridge()
 
 	def init_belief(self):
 		assert len(self.map_img.shape) == 2
 		width, height, thetas = *self.map_img.shape, 360
-		self.belief = np.ones((width, height, thetas))
+		self.belief = np.ones((width, height))
 		self.belief *= np.stack([self.map_img]*thetas, axis=2)
 		self.belief *= (1/np.count_nonzero(self.map_img))
 

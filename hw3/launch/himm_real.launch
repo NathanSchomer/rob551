@@ -1,0 +1,13 @@
+<launch>
+    <node pkg="robot_localization" name="robot_loc_node" type="ekf_localization_node">
+        <rosparam command="load" file="$(find hw3)/config/ekf.yaml"/>
+    </node>
+    <node pkg='hw2' name='HIMM' type='himm.py'>
+	<param name='pose_topic' value='odom' type='str'/>
+	<param name='lidar_topic' value='scan' type='str'/>
+	<param name='map_dim' value='250' type='int'/>
+	<param name='pose_offset' value='12' type='double'/>
+	<param name='scale_factor' value='10' type='double'/>
+	<param name='max_range' value='100000' type='double'/> <!-- arbitrarily high value -->
+    </node>
+</launch>
